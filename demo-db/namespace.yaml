@@ -17,9 +17,9 @@ metadata:
   namespace: demo-db
 spec:
   hard:
-    requests.cpu: "2"
+    requests.cpu: "3"
     requests.memory: 4Gi
-    limits.cpu: "4"
+    limits.cpu: "6"
     limits.memory: 8Gi
     requests.storage: 20Gi
     persistentvolumeclaims: "10"

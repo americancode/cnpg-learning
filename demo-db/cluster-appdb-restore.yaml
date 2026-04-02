@@ -14,7 +14,7 @@ spec:
     recovery:
       source: appdb-source
       recoveryTarget:
-        targetTime: "2026-04-02T21:25:42.322+00:00"
+        targetTime: "2026-04-02 22:22:04.251358+00"
       database: app
       owner: app
       secret:
@@ -33,7 +33,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: appdb-restore-store
-        serverName: appdb-restore
+        serverName: "appdb-restore-20260402222204"
   externalClusters:
     - name: appdb-source
       plugin:

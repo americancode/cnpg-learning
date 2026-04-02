@@ -33,7 +33,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: appdb-restore-store
-        serverName: appdb-restore
+        serverName: "__RESTORE_SERVER_NAME__"
   externalClusters:
     - name: appdb-source
       plugin:
