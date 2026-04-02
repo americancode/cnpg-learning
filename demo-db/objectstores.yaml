@@ -1,0 +1,61 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: appdb-store
+  namespace: demo-db
+spec:
+  retentionPolicy: 7d
+  configuration:
+    destinationPath: s3://cnpg-backups/
+    endpointURL: http://minio.demo-db.svc.cluster.local:9000
+    s3Credentials:
+      accessKeyId:
+        name: minio-creds
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: minio-creds
+        key: ACCESS_SECRET_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+  instanceSidecarConfiguration:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: appdb-restore-store
+  namespace: demo-db
+spec:
+  retentionPolicy: 7d
+  configuration:
+    destinationPath: s3://cnpg-backups/
+    endpointURL: http://minio.demo-db.svc.cluster.local:9000
+    s3Credentials:
+      accessKeyId:
+        name: minio-creds
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: minio-creds
+        key: ACCESS_SECRET_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+  instanceSidecarConfiguration:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi

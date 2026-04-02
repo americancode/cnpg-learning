@@ -1,0 +1,11 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: appdb-plugin-basebackup
+  namespace: demo-db
+spec:
+  cluster:
+    name: appdb
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

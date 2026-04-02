@@ -1,0 +1,43 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: appdb-restore
+  namespace: demo-db
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+  imagePullPolicy: IfNotPresent
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: appdb-superuser
+  bootstrap:
+    recovery:
+      source: appdb-source
+      recoveryTarget:
+        targetTime: "__TARGET_TIME__"
+      database: app
+      owner: app
+      secret:
+        name: appdb-app
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  storage:
+    size: 5Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: appdb-restore-store
+        serverName: appdb-restore
+  externalClusters:
+    - name: appdb-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: appdb-store
+          serverName: appdb
