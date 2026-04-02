@@ -1,0 +1,6 @@
+fullnameOverride: pgo
+singleNamespace: false
+debug: false
+extraEnv:
+  - name: PGO_TARGET_NAMESPACES
+    value: "migration-db"

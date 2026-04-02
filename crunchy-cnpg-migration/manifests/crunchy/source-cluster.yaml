@@ -1,0 +1,58 @@
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: crunchy-source
+  namespace: migration-db
+spec:
+  postgresVersion: 17
+  authentication:
+    rules:
+      - hba: hostssl replication migrator all scram-sha-256
+  users:
+    - name: app
+      databases:
+        - app
+    - name: migrator
+      databases:
+        - app
+      options: "SUPERUSER"
+  instances:
+    - name: instance1
+      replicas: 1
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi
+      dataVolumeClaimSpec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+  backups:
+    pgbackrest:
+      configuration:
+        - secret:
+            name: crunchy-source-pgbackrest-secrets
+      global:
+        archive-async: "n"
+        repo1-path: /pgbackrest/migration
+        repo1-s3-uri-style: path
+        repo1-storage-verify-tls: "n"
+      jobs:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      repos:
+        - name: repo1
+          s3:
+            bucket: crunchy-cnpg-migration
+            endpoint: minio.migration-db.svc.cluster.local:9000
+            region: us-east-1

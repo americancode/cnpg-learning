@@ -1,0 +1,5 @@
+fullnameOverride: cnpg-controller-manager
+crds:
+  create: true
+config:
+  clusterWide: true
