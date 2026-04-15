@@ -11,8 +11,25 @@ spec:
         - name: mc-config
           emptyDir: {}
       initContainers:
+        # Use Chainguard curl for health checks; no shell required.
+        - name: wait-for-minio
+          image: docker.io/chainguard/curl:latest
+          command:
+            - curl
+          args:
+            - --fail
+            - --silent
+            - --show-error
+            - --retry
+            - "60"
+            - --retry-all-errors
+            - --retry-delay
+            - "2"
+            - --retry-max-time
+            - "120"
+            - http://minio.minio.svc.cluster.local:9000/minio/health/live
         - name: configure-alias
-          image: cgr.dev/chainguard/minio-client:latest
+          image: docker.io/chainguard/minio-client:latest
           env:
             - name: MINIO_ENDPOINT
               value: http://minio.minio.svc.cluster.local:9000
@@ -40,22 +57,9 @@ spec:
             - $(MINIO_ENDPOINT)
             - $(MINIO_ACCESS_KEY)
             - $(MINIO_SECRET_KEY)
-        - name: wait-for-minio
-          image: cgr.dev/chainguard/minio-client:latest
-          env:
-            - name: MC_CONFIG_DIR
-              value: /mc-config
-          volumeMounts:
-            - name: mc-config
-              mountPath: /mc-config
-          command:
-            - mc
-          args:
-            - ls
-            - local
       containers:
         - name: create-buckets
-          image: cgr.dev/chainguard/minio-client:latest
+          image: docker.io/chainguard/minio-client:latest
           env:
             - name: MC_CONFIG_DIR
               value: /mc-config
