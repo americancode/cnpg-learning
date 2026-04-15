@@ -13,7 +13,7 @@ spec:
       initContainers:
         # Use Chainguard curl for health checks; no shell required.
         - name: wait-for-minio
-          image: cgchainguard/curl:latest
+          image: docker.io/chainguard/curl:latest
           command:
             - curl
           args:
