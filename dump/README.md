@@ -21,15 +21,41 @@ docker push registry.example.com/backup-tools:latest
 
 Then update the `image` field in [backup-job.yaml](backup-job.yaml).
 
-## Required Azure Variables
+## Azure Destination
 
-Set `AZURE_CONTAINER`, then use one of these auth styles:
+Set `AZURE_TARGET_TYPE` to `blob` or `file`.
+
+For Azure Blob Storage:
+
+```yaml
+AZURE_TARGET_TYPE: blob
+AZURE_BLOB_CONTAINER: database-and-minio-backups
+AZURE_CREATE_DESTINATION: "true"
+```
+
+For Azure Files:
+
+```yaml
+AZURE_TARGET_TYPE: file
+AZURE_FILE_SHARE: database-and-minio-backups
+AZURE_CREATE_DESTINATION: "true"
+```
+
+Then use one of these auth styles:
 
 - `AZURE_STORAGE_CONNECTION_STRING`
 - `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_KEY`
 - `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_SAS_TOKEN`
 
 `BACKUP_PREFIX` defaults to `backups`.
+
+If you use a SAS scoped to an existing blob container or file share, set:
+
+```yaml
+AZURE_CREATE_DESTINATION: "false"
+```
+
+For Blob targets, the script uses `az storage blob upload`. For Azure Files targets, it uses `az storage file upload` and creates the destination directories inside the file share before uploading each artifact.
 
 ## MinIO Backups
 

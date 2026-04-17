@@ -3,7 +3,11 @@ kind: ConfigMap
 metadata:
   name: backup-config
 data:
-  AZURE_CONTAINER: database-and-minio-backups
+  # Set AZURE_TARGET_TYPE to "blob" or "file".
+  AZURE_TARGET_TYPE: blob
+  AZURE_BLOB_CONTAINER: database-and-minio-backups
+  AZURE_FILE_SHARE: database-and-minio-backups
+  AZURE_CREATE_DESTINATION: "true"
   BACKUP_PREFIX: k8s
   WORKDIR: /backup/work
 
@@ -87,9 +91,22 @@ spec:
               }
 
               azure_args=()
+              AZURE_TARGET_TYPE="${AZURE_TARGET_TYPE:-blob}"
 
               configure_azure_args() {
-                require_env AZURE_CONTAINER
+                case "$AZURE_TARGET_TYPE" in
+                  blob)
+                    AZURE_BLOB_CONTAINER="${AZURE_BLOB_CONTAINER:-${AZURE_CONTAINER:-}}"
+                    require_env AZURE_BLOB_CONTAINER
+                    ;;
+                  file)
+                    AZURE_FILE_SHARE="${AZURE_FILE_SHARE:-${AZURE_SHARE:-}}"
+                    require_env AZURE_FILE_SHARE
+                    ;;
+                  *)
+                    die "AZURE_TARGET_TYPE must be 'blob' or 'file'"
+                    ;;
+                esac
 
                 if [ -n "${AZURE_STORAGE_CONNECTION_STRING:-}" ]; then
                   azure_args=(--connection-string "$AZURE_STORAGE_CONNECTION_STRING")
@@ -111,18 +128,92 @@ spec:
                 die "Provide AZURE_STORAGE_CONNECTION_STRING, or AZURE_STORAGE_ACCOUNT with AZURE_STORAGE_KEY or AZURE_STORAGE_SAS_TOKEN"
               }
 
-              upload_blob() {
-                local file="$1"
-                local blob_name="$2"
+              ensure_azure_destination() {
+                if [ "${AZURE_CREATE_DESTINATION:-true}" != "true" ]; then
+                  log "Skipping Azure destination creation because AZURE_CREATE_DESTINATION is not true"
+                  return 0
+                fi
 
-                log "Uploading ${file} to azure://${AZURE_CONTAINER}/${blob_name}"
-                az storage blob upload \
-                  "${azure_args[@]}" \
-                  --container-name "$AZURE_CONTAINER" \
-                  --name "$blob_name" \
-                  --file "$file" \
-                  --overwrite true \
-                  --only-show-errors >/dev/null
+                case "$AZURE_TARGET_TYPE" in
+                  blob)
+                    log "Ensuring Azure Blob container ${AZURE_BLOB_CONTAINER} exists"
+                    az storage container create \
+                      "${azure_args[@]}" \
+                      --name "$AZURE_BLOB_CONTAINER" \
+                      --only-show-errors >/dev/null
+                    ;;
+                  file)
+                    log "Ensuring Azure Files share ${AZURE_FILE_SHARE} exists"
+                    az storage share create \
+                      "${azure_args[@]}" \
+                      --name "$AZURE_FILE_SHARE" \
+                      --only-show-errors >/dev/null
+                    ;;
+                esac
+              }
+
+              ensure_file_share_dirs() {
+                local file_path="$1"
+                local dir_path="${file_path%/*}"
+                local current=""
+                local part exists
+
+                [ "$dir_path" != "$file_path" ] || return 0
+
+                IFS='/' read -r -a parts <<<"$dir_path"
+                for part in "${parts[@]}"; do
+                  [ -n "$part" ] || continue
+
+                  if [ -z "$current" ]; then
+                    current="$part"
+                  else
+                    current="${current}/${part}"
+                  fi
+
+                  exists="$(az storage directory exists \
+                    "${azure_args[@]}" \
+                    --share-name "$AZURE_FILE_SHARE" \
+                    --name "$current" \
+                    --query exists \
+                    -o tsv \
+                    --only-show-errors)"
+
+                  if [ "$exists" != "True" ] && [ "$exists" != "true" ]; then
+                    az storage directory create \
+                      "${azure_args[@]}" \
+                      --share-name "$AZURE_FILE_SHARE" \
+                      --name "$current" \
+                      --only-show-errors >/dev/null
+                  fi
+                done
+              }
+
+              upload_artifact() {
+                local file="$1"
+                local artifact_path="$2"
+
+                case "$AZURE_TARGET_TYPE" in
+                  blob)
+                    log "Uploading ${file} to azure-blob://${AZURE_BLOB_CONTAINER}/${artifact_path}"
+                    az storage blob upload \
+                      "${azure_args[@]}" \
+                      --container-name "$AZURE_BLOB_CONTAINER" \
+                      --name "$artifact_path" \
+                      --file "$file" \
+                      --overwrite true \
+                      --only-show-errors >/dev/null
+                    ;;
+                  file)
+                    log "Uploading ${file} to azure-file://${AZURE_FILE_SHARE}/${artifact_path}"
+                    ensure_file_share_dirs "$artifact_path"
+                    az storage file upload \
+                      "${azure_args[@]}" \
+                      --share-name "$AZURE_FILE_SHARE" \
+                      --source "$file" \
+                      --path "$artifact_path" \
+                      --only-show-errors >/dev/null
+                    ;;
+                esac
               }
 
               slugify() {
@@ -171,7 +262,7 @@ spec:
 
                   log "Creating archive ${archive}"
                   tar -C "$bucket_dir" -czf "$archive" .
-                  upload_blob "$archive" "$blob_name"
+                  upload_artifact "$archive" "$blob_name"
                 done
               }
 
@@ -195,7 +286,7 @@ spec:
                     --file "$archive" \
                     "$DATABASE_URL"
 
-                  upload_blob "$archive" "$blob_name"
+                  upload_artifact "$archive" "$blob_name"
                   return 0
                 fi
 
@@ -220,7 +311,7 @@ spec:
                     --no-acl \
                     --file "$archive"
 
-                  upload_blob "$archive" "$blob_name"
+                  upload_artifact "$archive" "$blob_name"
                 done
               }
 
@@ -234,11 +325,7 @@ spec:
 
               mkdir -p "$WORKDIR"
 
-              log "Ensuring Azure Blob container ${AZURE_CONTAINER} exists"
-              az storage container create \
-                "${azure_args[@]}" \
-                --name "$AZURE_CONTAINER" \
-                --only-show-errors >/dev/null
+              ensure_azure_destination
 
               backup_minio
               backup_postgres
