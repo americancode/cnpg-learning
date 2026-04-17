@@ -5,6 +5,7 @@ metadata:
 data:
   AZURE_CONTAINER: database-and-minio-backups
   BACKUP_PREFIX: k8s
+  WORKDIR: /backup/work
 
   # Set MINIO_ENDPOINT to enable MinIO bucket backups.
   MINIO_ENDPOINT: http://minio:9000
@@ -59,6 +60,9 @@ spec:
                 name: backup-config
             - secretRef:
                 name: backup-credentials
+          volumeMounts:
+            - name: backup-work
+              mountPath: /backup
           command:
             - /bin/bash
             - -lc
@@ -224,10 +228,11 @@ spec:
 
               BACKUP_TIMESTAMP="${BACKUP_TIMESTAMP:-$(date -u +%Y%m%dT%H%M%SZ)}"
               BACKUP_PREFIX="${BACKUP_PREFIX:-backups}"
-              WORKDIR="${WORKDIR:-$(mktemp -d)}"
+              WORKDIR="${WORKDIR:-/backup/work}"
+              WORKDIR="${WORKDIR%/}/${BACKUP_TIMESTAMP}"
               export BACKUP_TIMESTAMP BACKUP_PREFIX WORKDIR
 
-              trap 'rm -rf "$WORKDIR"' EXIT
+              mkdir -p "$WORKDIR"
 
               log "Ensuring Azure Blob container ${AZURE_CONTAINER} exists"
               az storage container create \
@@ -239,3 +244,13 @@ spec:
               backup_postgres
 
               log "Backup complete"
+      volumes:
+        - name: backup-work
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 100Gi
