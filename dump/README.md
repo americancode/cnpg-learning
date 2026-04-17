@@ -78,7 +78,7 @@ pg_restore --clean --if-exists --dbname "$DATABASE_URL" backup.dump
 
 ## Kubernetes Job
 
-[backup-job.yaml](backup-job.yaml) contains a `ConfigMap`, `Secret`, and `Job`. The Job uses a generic ephemeral PVC-backed volume that requests `100Gi` and is mounted at `/backup`; each run writes temporary backup artifacts under `/backup/work/<timestamp>`. The Job keeps `ttlSecondsAfterFinished: 86400`, so the completed Job/Pod and ephemeral PVC remain for about 24 hours, then Kubernetes deletes the Job/Pod and the ephemeral PVC and its data are deleted with the Pod. Replace the placeholder secret values and image name before applying it:
+[backup-job.yaml](backup-job.yaml) contains a `ConfigMap`, `Secret`, and `Job`. The Job uses `emptyDir` scratch storage with `sizeLimit: 100Gi` mounted at `/backup`; each run writes backup artifacts under `/backup/work/<timestamp>`. The data is deleted automatically when Kubernetes removes the Pod after `ttlSecondsAfterFinished: 86400`. Replace the placeholder secret values and image name before applying it:
 
 ```sh
 kubectl apply -f backup-job.yaml

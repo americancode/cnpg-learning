@@ -246,11 +246,5 @@ spec:
               log "Backup complete"
       volumes:
         - name: backup-work
-          ephemeral:
-            volumeClaimTemplate:
-              spec:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 100Gi
+          emptyDir:
+            sizeLimit: 100Gi
