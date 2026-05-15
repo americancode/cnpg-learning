@@ -3,4 +3,5 @@ kind: Kustomization
 
 resources:
   - crunchy-postgrescluster.yaml
+  - external-secret.yaml
   - password-rotation-job.yaml
