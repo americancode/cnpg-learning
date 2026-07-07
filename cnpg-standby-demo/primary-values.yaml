@@ -1,0 +1,51 @@
+fullnameOverride: appdb-east
+
+mode: standalone
+type: postgresql
+
+version:
+  postgresql: "17"
+
+cluster:
+  instances: 1
+  storage:
+    size: 5Gi
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  primaryUpdateMethod: restart
+  initdb:
+    database: app
+    owner: app
+  postgresql:
+    parameters:
+      archive_timeout: "60s"
+      max_wal_size: "1GB"
+      shared_buffers: "128MB"
+
+backups:
+  enabled: true
+  provider: s3
+  endpointURL: "http://minio.storage.svc.cluster.local:9000"
+  destinationPath: "s3://cnpg-backups/appdb-east"
+  retentionPolicy: "7d"
+  wal:
+    compression: gzip
+    encryption: ""
+    maxParallel: 1
+  data:
+    compression: gzip
+    encryption: ""
+    jobs: 2
+  s3:
+    bucket: cnpg-backups
+    path: "/appdb-east"
+    accessKey: minioadmin
+    secretKey: minioadmin123
+    region: local
+  scheduledBackups: []
