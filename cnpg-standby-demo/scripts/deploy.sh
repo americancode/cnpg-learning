@@ -29,12 +29,14 @@ helm upgrade --install cnpg cnpg/cloudnative-pg \
   --namespace cnpg-system \
   --create-namespace \
   --version "${CNPG_VERSION}" \
-  -f "${ROOT_DIR}/../cnpg-pitr/platform/cnpg-operator/values.yaml"
+  -f "${ROOT_DIR}/cnpg-operator-values.yaml"
 kubectl -n cnpg-system rollout status deployment/cnpg-controller-manager --timeout=10m
 kubectl apply -k "${ROOT_DIR}/../cnpg-pitr/platform/barman-cloud-plugin"
 kubectl wait --for=condition=Established crd/objectstores.barmancloud.cnpg.io --timeout=5m
 kubectl wait --for=condition=Established crd/backups.postgresql.cnpg.io --timeout=5m
 kubectl -n cnpg-system rollout status deployment/barman-cloud --timeout=10m
+kubectl -n cnpg-system wait --for=jsonpath='{.subsets[0].addresses[0].ip}' endpoints/cnpg-webhook-service --timeout=5m
+sleep 10
 
 kubectl apply -f "${ROOT_DIR}/manifests/minio.yaml"
 kubectl -n "${STORAGE_NAMESPACE}" rollout status deployment/minio --timeout=10m
@@ -62,9 +64,6 @@ metadata:
 spec:
   cluster:
     name: appdb-east
-  method: plugin
-  pluginConfiguration:
-    name: barman-cloud.cloudnative-pg.io
 EOF
 for _ in $(seq 1 120); do
   backup_phase="$(kubectl -n "${PRIMARY_NAMESPACE}" get backup appdb-east-initial -o jsonpath='{.status.phase}' 2>/dev/null || true)"

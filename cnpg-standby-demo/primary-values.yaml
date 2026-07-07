@@ -11,13 +11,6 @@ cluster:
   storage:
     size: 5Gi
   imageName: ghcr.io/cloudnative-pg/postgresql:17.5
-  resources:
-    requests:
-      cpu: 250m
-      memory: 512Mi
-    limits:
-      cpu: "1"
-      memory: 1Gi
   primaryUpdateMethod: restart
   initdb:
     database: app
