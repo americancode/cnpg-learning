@@ -1,12 +1,11 @@
 # Postgres Migration Demos
 
-This repo contains three separate projects:
+This repo contains two parallel demo families:
 
-- `cnpg-pitr`
-  A CloudNativePG point-in-time recovery demo using MinIO and the Barman Cloud plugin.
-- `cnpg-standby-demo`
-  A CloudNativePG primary/standby object-store replication demo using MinIO and the Barman Cloud plugin.
-- `crunchy-cnpg-migration`
-  A simple migration demo that uses Crunchy Postgres for Kubernetes as the source and bootstraps CloudNativePG from it using `pg_basebackup`.
+- `demo-barman-plugin/`
+  The original plugin-based demos:
+  `cnpg-pitr`, `cnpg-standby-demo`, and `crunchy-cnpg-migration`.
+- `demo-integrated-barman/`
+  Integrated-Barman copies of the same three demos.
 
-Each project is intentionally isolated so its platform assets, manifests, namespaces, and scripts do not depend on another demo directory.
+Each demo is intentionally isolated so its platform assets, manifests, namespaces, and scripts do not depend on another demo directory.

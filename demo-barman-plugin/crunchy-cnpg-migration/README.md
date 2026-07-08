@@ -35,16 +35,16 @@ Crunchy still uses `pgBackRest` to write S3 backups so the source cluster has a 
 ## Intended Flow
 
 ```bash
-crunchy-cnpg-migration/scripts/init-podman-machine.sh
-crunchy-cnpg-migration/scripts/init-cluster.sh
-crunchy-cnpg-migration/scripts/install-platform.sh
-crunchy-cnpg-migration/scripts/setup-namespace.sh
-crunchy-cnpg-migration/scripts/setup-storage.sh
-crunchy-cnpg-migration/scripts/deploy-crunchy-source.sh
-crunchy-cnpg-migration/scripts/seed-crunchy-source.sh
-crunchy-cnpg-migration/scripts/trigger-crunchy-backup.sh
-crunchy-cnpg-migration/scripts/deploy-cnpg-target.sh
-crunchy-cnpg-migration/scripts/verify-migration.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/init-podman-machine.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/init-cluster.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/install-platform.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/setup-namespace.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/setup-storage.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/deploy-crunchy-source.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/seed-crunchy-source.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/trigger-crunchy-backup.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/deploy-cnpg-target.sh
+./demo-barman-plugin/crunchy-cnpg-migration/scripts/verify-migration.sh
 ```
 
 ## Sources

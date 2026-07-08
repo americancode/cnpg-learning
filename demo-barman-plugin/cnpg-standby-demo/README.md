@@ -28,17 +28,17 @@ Files:
 Recommended flow:
 
 ```bash
-./cnpg-standby-demo/scripts/init-podman-machine.sh
-./cnpg-standby-demo/scripts/init-cluster.sh
-./cnpg-standby-demo/scripts/install-platform.sh
-./cnpg-standby-demo/scripts/setup-namespaces.sh
-./cnpg-standby-demo/scripts/setup-storage.sh
-./cnpg-standby-demo/scripts/deploy-primary.sh
-./cnpg-standby-demo/scripts/create-base-backup.sh
-./cnpg-standby-demo/scripts/deploy-standby.sh
-./cnpg-standby-demo/scripts/verify-replication.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/init-podman-machine.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/init-cluster.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/install-platform.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/setup-namespaces.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/setup-storage.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/deploy-primary.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/create-base-backup.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/deploy-standby.sh
+./demo-barman-plugin/cnpg-standby-demo/scripts/verify-replication.sh
 ```
 
 `scripts/deploy.sh` remains as a convenience wrapper, but it only composes the individual steps and does not destroy the cluster.
 
-If you previously deployed the older integrated-backup version of this demo into the same `kind` cluster, run `./cnpg-standby-demo/scripts/reset-demo.sh` once before applying the new plugin-based manifests.
+If you previously deployed the older integrated-backup version of this demo into the same `kind` cluster, run `./demo-barman-plugin/cnpg-standby-demo/scripts/reset-demo.sh` once before applying the new plugin-based manifests.

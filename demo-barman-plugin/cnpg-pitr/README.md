@@ -27,34 +27,34 @@ The known-good PITR path in this project uses:
 Initialize the podman VM if needed:
 
 ```bash
-./cnpg-pitr/scripts/init-podman-machine.sh
+./demo-barman-plugin/cnpg-pitr/scripts/init-podman-machine.sh
 ```
 
 Create or reuse the cluster:
 
 ```bash
-./cnpg-pitr/scripts/init-cluster.sh
+./demo-barman-plugin/cnpg-pitr/scripts/init-cluster.sh
 ```
 
 Install platform components:
 
 ```bash
-./cnpg-pitr/scripts/install-platform.sh
+./demo-barman-plugin/cnpg-pitr/scripts/install-platform.sh
 ```
 
 Install the demo namespace, MinIO, object stores, and source cluster:
 
 ```bash
-./cnpg-pitr/scripts/setup-namespace.sh
-./cnpg-pitr/scripts/setup-storage.sh
-./cnpg-pitr/scripts/deploy-source-cluster.sh
+./demo-barman-plugin/cnpg-pitr/scripts/setup-namespace.sh
+./demo-barman-plugin/cnpg-pitr/scripts/setup-storage.sh
+./demo-barman-plugin/cnpg-pitr/scripts/deploy-source-cluster.sh
 ```
 
 Seed data, create a backup, and run PITR:
 
 ```bash
-cnpg-pitr/scripts/seed-initial-data.sh
-cnpg-pitr/scripts/create-plugin-backup.sh
-cnpg-pitr/scripts/create-pitr-window.sh
-cnpg-pitr/scripts/restore-pitr.sh
+./demo-barman-plugin/cnpg-pitr/scripts/seed-initial-data.sh
+./demo-barman-plugin/cnpg-pitr/scripts/create-plugin-backup.sh
+./demo-barman-plugin/cnpg-pitr/scripts/create-pitr-window.sh
+./demo-barman-plugin/cnpg-pitr/scripts/restore-pitr.sh
 ```
