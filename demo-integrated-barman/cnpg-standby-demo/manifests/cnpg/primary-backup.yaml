@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: appdb-east-initial
+  namespace: db-east
+spec:
+  cluster:
+    name: appdb-east

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: storage
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: db-east
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: db-west

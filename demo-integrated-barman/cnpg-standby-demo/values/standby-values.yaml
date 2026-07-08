@@ -1,0 +1,43 @@
+fullnameOverride: appdb-west
+
+mode: replica
+type: postgresql
+
+version:
+  postgresql: "17"
+
+cluster:
+  instances: 1
+  storage:
+    size: 5Gi
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+  primaryUpdateMethod: restart
+  postgresql:
+    parameters:
+      archive_timeout: "60s"
+      max_wal_size: "1GB"
+      shared_buffers: "128MB"
+
+replica:
+  bootstrap:
+    source: object_store
+    database: app
+    owner: app
+  origin:
+    objectStore:
+      clusterName: appdb-east
+      provider: s3
+      endpointURL: "http://minio.storage.svc.cluster.local:9000"
+      destinationPath: "s3://cnpg-backups/appdb-east"
+      wal:
+        encryption: ""
+      data:
+        encryption: ""
+      s3:
+        bucket: cnpg-backups
+        path: "/appdb-east"
+        accessKey: minioadmin
+        secretKey: minioadmin123
+        region: local
+      retentionPolicy: "7d"
+      scheduledBackups: []

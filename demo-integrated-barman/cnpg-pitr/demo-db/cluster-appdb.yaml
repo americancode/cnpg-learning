@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: appdb-app
+  namespace: demo-db
+type: kubernetes.io/basic-auth
+stringData:
+  username: app
+  password: apppass123
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: appdb-superuser
+  namespace: demo-db
+type: kubernetes.io/basic-auth
+stringData:
+  username: postgres
+  password: postgres123
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: appdb
+  namespace: demo-db
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+  imagePullPolicy: IfNotPresent
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: appdb-superuser
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      secret:
+        name: appdb-app
+  storage:
+    size: 5Gi
+  postgresql:
+    parameters:
+      archive_timeout: "60s"
+      max_wal_size: 1GB
+      shared_buffers: 128MB
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://cnpg-backups/appdb
+      endpointURL: http://minio.demo-db.svc.cluster.local:9000
+      s3Credentials:
+        accessKeyId:
+          name: minio-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: minio-creds
+          key: ACCESS_SECRET_KEY
+      data:
+        compression: gzip
+      wal:
+        compression: gzip
+        maxParallel: 8
+    retentionPolicy: 7d
