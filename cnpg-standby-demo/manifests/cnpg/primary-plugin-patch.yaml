@@ -1,3 +1,6 @@
+# The cnpg/cluster chart does not currently expose spec.plugins values,
+# so this patch adds the Barman plugin WAL archiver configuration after
+# the chart-managed Cluster resource is created.
 spec:
   plugins:
     - name: barman-cloud.cloudnative-pg.io

@@ -1,3 +1,7 @@
+# The cnpg/cluster chart renders replica recovery through
+# externalClusters[].barmanObjectStore, but it does not expose the
+# plugin-based external cluster fields. This patch swaps the standby
+# Cluster over to plugin-backed recovery and replay.
 spec:
   bootstrap:
     recovery:

@@ -11,5 +11,7 @@ helm upgrade --install appdb-east cnpg/cluster \
   --namespace "${PRIMARY_NAMESPACE}" \
   --create-namespace \
   -f "${ROOT_DIR}/values/primary-values.yaml"
+# Patch the chart-managed Cluster because the chart does not expose
+# plugin WAL archiver fields in values yet.
 kubectl -n "${PRIMARY_NAMESPACE}" patch cluster appdb-east --type=merge --patch-file "${ROOT_DIR}/manifests/cnpg/primary-plugin-patch.yaml"
 wait_cluster_ready "${PRIMARY_NAMESPACE}" appdb-east
