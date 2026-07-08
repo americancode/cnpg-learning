@@ -8,6 +8,7 @@ This project demonstrates the simplest supported migration path from Crunchy Pos
 4. seed source data
 5. trigger and verify a Crunchy backup
 6. bootstrap a new CNPG cluster from the live Crunchy source using `pg_basebackup`
+7. archive CNPG WAL to MinIO using the Barman Cloud plugin Helm chart
 
 This is intentionally the simple path. It does not attempt to restore Crunchy `pgBackRest` backups directly into CNPG.
 
@@ -34,9 +35,11 @@ Crunchy still uses `pgBackRest` to write S3 backups so the source cluster has a 
 ## Intended Flow
 
 ```bash
-crunchy-cnpg-migration/scripts/cleanup-cluster.sh
+crunchy-cnpg-migration/scripts/init-podman-machine.sh
+crunchy-cnpg-migration/scripts/init-cluster.sh
 crunchy-cnpg-migration/scripts/install-platform.sh
-crunchy-cnpg-migration/scripts/deploy-foundation.sh
+crunchy-cnpg-migration/scripts/setup-namespace.sh
+crunchy-cnpg-migration/scripts/setup-storage.sh
 crunchy-cnpg-migration/scripts/deploy-crunchy-source.sh
 crunchy-cnpg-migration/scripts/seed-crunchy-source.sh
 crunchy-cnpg-migration/scripts/trigger-crunchy-backup.sh

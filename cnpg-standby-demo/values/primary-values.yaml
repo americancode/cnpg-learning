@@ -1,0 +1,22 @@
+fullnameOverride: appdb-east
+
+mode: standalone
+type: postgresql
+
+version:
+  postgresql: "17"
+
+cluster:
+  instances: 1
+  storage:
+    size: 5Gi
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+  primaryUpdateMethod: restart
+  initdb:
+    database: app
+    owner: app
+  postgresql:
+    parameters:
+      archive_timeout: "60s"
+      max_wal_size: "1GB"
+      shared_buffers: "128MB"

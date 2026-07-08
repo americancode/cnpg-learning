@@ -75,13 +75,6 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
           startupProbe:
             httpGet:
               path: /minio/health/live

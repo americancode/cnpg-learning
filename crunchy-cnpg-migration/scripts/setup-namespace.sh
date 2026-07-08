@@ -4,5 +4,4 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-"${ROOT_DIR}/scripts/setup-namespace.sh"
-"${ROOT_DIR}/scripts/setup-storage.sh"
+kubectl apply -f "${ROOT_DIR}/manifests/namespace.yaml"

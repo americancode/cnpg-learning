@@ -28,14 +28,14 @@ replica:
       clusterName: appdb-east
       provider: s3
       endpointURL: "http://minio.storage.svc.cluster.local:9000"
-      destinationPath: "s3://cnpg-backups/appdb-east"
+      destinationPath: "s3://cnpg-backups/"
       wal:
         encryption: ""
       data:
         encryption: ""
       s3:
         bucket: cnpg-backups
-        path: "/appdb-east"
+        path: "/"
         accessKey: minioadmin
         secretKey: minioadmin123
         region: local

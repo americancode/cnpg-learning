@@ -1,0 +1,16 @@
+spec:
+  bootstrap:
+    recovery:
+      source: appdb-east-source
+      database: app
+      owner: app
+  replica:
+    enabled: true
+    source: appdb-east-source
+  externalClusters:
+    - name: appdb-east-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: appdb-east-source-store
+          serverName: appdb-east

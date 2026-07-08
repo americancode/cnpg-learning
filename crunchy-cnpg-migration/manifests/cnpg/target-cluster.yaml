@@ -17,6 +17,29 @@ stringData:
   username: postgres
   password: "E@QJT-vx{YYDC6W{e==Xd9;K"
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: cnpg-target-store
+  namespace: migration-db
+spec:
+  retentionPolicy: 7d
+  configuration:
+    destinationPath: s3://crunchy-cnpg-migration/
+    endpointURL: http://minio.migration-db.svc.cluster.local:9000
+    s3Credentials:
+      accessKeyId:
+        name: minio-creds
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: minio-creds
+        key: ACCESS_SECRET_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -32,15 +55,14 @@ spec:
   bootstrap:
     pg_basebackup:
       source: crunchy-source
-  resources:
-    requests:
-      cpu: 250m
-      memory: 512Mi
-    limits:
-      cpu: "1"
-      memory: 1Gi
   storage:
     size: 5Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: cnpg-target-store
+        serverName: cnpg-target
   externalClusters:
     - name: crunchy-source
       connectionParameters:

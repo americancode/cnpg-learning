@@ -1,0 +1,3 @@
+fullnameOverride: barman-cloud
+crds:
+  create: true

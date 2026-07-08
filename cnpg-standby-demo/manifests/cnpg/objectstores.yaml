@@ -1,13 +1,13 @@
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
-  name: appdb-store
-  namespace: demo-db
+  name: appdb-east-store
+  namespace: db-east
 spec:
   retentionPolicy: 7d
   configuration:
     destinationPath: s3://cnpg-backups/
-    endpointURL: http://minio.demo-db.svc.cluster.local:9000
+    endpointURL: http://minio.storage.svc.cluster.local:9000
     s3Credentials:
       accessKeyId:
         name: minio-creds
@@ -24,13 +24,13 @@ spec:
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
-  name: appdb-restore-store
-  namespace: demo-db
+  name: appdb-east-source-store
+  namespace: db-west
 spec:
   retentionPolicy: 7d
   configuration:
     destinationPath: s3://cnpg-backups/
-    endpointURL: http://minio.demo-db.svc.cluster.local:9000
+    endpointURL: http://minio.storage.svc.cluster.local:9000
     s3Credentials:
       accessKeyId:
         name: minio-creds
